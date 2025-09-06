@@ -1,86 +1,160 @@
-:root{
-  --bg:#f6fff6;
-  --card:#fff;
-  --green:#2e7d32;
-  --muted:#6b6b6b;
-  --accent:#6aa84f;
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
-  background:linear-gradient(180deg, #f6fff6 0%, #f0fff0 100%);
-  color:#15232b;
-  -webkit-font-smoothing:antialiased;
-}
-.top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:18px 28px;
-  background:rgba(255,255,255,0.6);
-  border-bottom:1px solid rgba(0,0,0,0.04);
-}
-.brand{display:flex;align-items:center;gap:10px}
-.brand h1{margin:0;font-size:24px}
-.logo-leaf{font-size:22px}
-.top-actions{display:flex;gap:12px;align-items:center}
-.points{font-size:14px;color:var(--muted)}
-.container{
-  display:flex;
-  gap:18px;
-  padding:24px;
-  max-width:1100px;
-  margin:18px auto;
-}
-.left{flex:0 0 320px}
-.right{flex:1}
-.card{
-  background:var(--card);
-  padding:16px;
-  border-radius:12px;
-  box-shadow:0 6px 18px rgba(46,125,50,0.06);
-  margin-bottom:16px;
-}
-input, textarea{width:100%;padding:10px;margin:8px 0;border-radius:8px;border:1px solid #e6efe6;font-size:14px}
-textarea{min-height:70px;resize:vertical}
-.btn{background:var(--green);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
-.btn.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--green)}
-.row{display:flex;gap:8px;align-items:center}
-.row.between{display:flex;justify-content:space-between;align-items:center}
+// simple client-side app with product cards + icons
+let users = [];
+let products = [
+  {id:1,title:"Recycled Tote Bag",category:"Accessories",description:"Sturdy tote made from recycled fabric. Carry groceries guilt-free.",price:249, icon:"fa-solid fa-bag-shopping"},
+  {id:2,title:"Bamboo Toothbrush (2 pack)",category:"Personal Care",description:"Biodegradable toothbrushes with soft bristles.",price:129, icon:"fa-solid fa-tooth"},
+  {id:3,title:"Zero-waste Soap Bar",category:"Home",description:"Scented soap bar, plastic-free packaging.",price:89, icon:"fa-solid fa-soap"}
+];
+let nextProductId = 4;
+let currentUser = null;
 
-.searchCard input{max-width:320px}
+function $(id){return document.getElementById(id)}
+function show(el, yes=true){ if(el) el.style.display = yes ? "" : "none" }
 
-.product-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
-  gap:14px;
+function updateUI(){
+  $("points").querySelector("strong").innerText = currentUser ? (currentUser.points||0) : 0;
+  show($("addProductCard"), !!currentUser);
+  show($("logoutBtn"), !!currentUser);
+  show($("registerBlock"), !currentUser);
+  show($("loginBlock"), false);
+  renderProducts();
+  renderCart();
 }
-.product-card{
-  border-radius:10px;
-  padding:12px;
-  display:flex;
-  gap:12px;
-  align-items:flex-start;
-  background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(245,255,245,0.85));
-  border:1px solid rgba(0,0,0,0.03);
-}
-.product-thumb{
-  width:72px;height:72px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:28px;background:rgba(0,0,0,0.02)
-}
-.product-info{flex:1}
-.product-info h4{margin:0 0 6px 0;font-size:16px}
-.product-info p{margin:0;color:var(--muted);font-size:13px}
-.product-footer{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
-.price{font-weight:700;color:var(--green)}
 
-.cart-list{list-style:none;padding:0;margin:0}
-.cart-list li{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed rgba(0,0,0,0.03)}
-
-.foot{text-align:center;padding:18px;color:var(--muted)}
-
-@media(max-width:900px){
-  .container{flex-direction:column;padding:12px}
-  .left{width:100%}
-  .product-grid{grid-template-columns:repeat(1, 1fr)}
+function showLogin(){
+  show($("registerBlock"), false);
+  show($("loginBlock"), true);
 }
+function showRegister(){
+  show($("loginBlock"), false);
+  show($("registerBlock"), true);
+}
+
+function register(){
+  const username = $("regName").value.trim();
+  const email = $("regEmail").value.trim().toLowerCase();
+  const pass = $("regPass").value;
+  if(!username||!email||!pass) return alert("Fill all fields");
+  if(users.find(u=>u.email===email)) return alert("Email exists");
+  const u = {username,email,password:pass,points:0,cart:[]};
+  users.push(u);
+  currentUser = u;
+  $("regName").value=""; $("regEmail").value=""; $("regPass").value="";
+  alert(`🎉 Welcome, ${username}!`);
+  updateUI();
+}
+
+function login(){
+  const email = $("logEmail").value.trim().toLowerCase();
+  const pass = $("logPass").value;
+  const u = users.find(x=>x.email===email && x.password===pass);
+  if(!u) return alert("Wrong credentials");
+  currentUser = u;
+  $("logEmail").value=""; $("logPass").value="";
+  alert(`💚 Welcome back, ${u.username}!`);
+  updateUI();
+}
+
+function logout(){
+  if(currentUser) alert(`👋 Bye ${currentUser.username}!`);
+  currentUser = null;
+  updateUI();
+}
+
+function addProduct(){
+  if(!currentUser) return alert("Login first");
+  const t = $("pTitle").value.trim();
+  const c = $("pCategory").value.trim() || "Misc";
+  const d = $("pDesc").value.trim();
+  const icon = $("pIcon").value.trim();
+  const p = parseFloat($("pPrice").value);
+  if(!t || isNaN(p)) return alert("Complete product info");
+  const item = {id: nextProductId++, title:t, category:c, description:d, price:p, icon: icon || "fa-solid fa-seedling"};
+  products.unshift(item);
+  $("pTitle").value=""; $("pCategory").value=""; $("pDesc").value=""; $("pPrice").value=""; $("pIcon").value="";
+  alert("🌟 Product added!");
+  renderProducts();
+}
+
+function renderProducts(){
+  const list = $("products"); list.innerHTML="";
+  const q = $("search").value.trim().toLowerCase();
+  const filtered = products.filter(p => !q || p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q) || p.description.toLowerCase().includes(q));
+  filtered.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "product-card";
+    const thumb = document.createElement("div");
+    thumb.className = "product-thumb";
+    // icon using FontAwesome class or fallback emoji
+    if(p.icon && p.icon.startsWith("fa")) {
+      thumb.innerHTML = `<i class="${p.icon}" style="font-size:28px;color:var(--accent)"></i>`;
+    } else {
+      // emoji fallback if user typed emoji or nothing
+      thumb.innerText = p.icon ? p.icon : "🛍️";
+    }
+
+    const info = document.createElement("div");
+    info.className = "product-info";
+    info.innerHTML = `<h4>${escapeHtml(p.title)}</h4>
+                      <div class="small">${escapeHtml(p.category)}</div>
+                      <p>${escapeHtml(p.description)}</p>
+                      <div class="product-footer">
+                        <div class="price">$${p.price.toFixed(2)}</div>
+                        <div>
+                          <button class="btn ghost" onclick="addToCart(${p.id})">➕ Add</button>
+                        </div>
+                      </div>`;
+
+    div.appendChild(thumb);
+    div.appendChild(info);
+    list.appendChild(div);
+  });
+}
+
+function addToCart(pid){
+  if(!currentUser) return alert("Please login to add to cart");
+  const prod = products.find(p=>p.id===pid);
+  currentUser.cart = currentUser.cart || [];
+  const item = currentUser.cart.find(i => i.product.id === pid);
+  if(item) item.quantity++;
+  else currentUser.cart.push({product:prod, quantity:1});
+  alert(`🛒 Added ${prod.title} to cart`);
+  renderCart();
+}
+
+function renderCart(){
+  const out = $("cartList"); out.innerHTML="";
+  if(!currentUser || !currentUser.cart || currentUser.cart.length===0){
+    out.innerHTML = "<li class='small'>Your cart is empty</li>";
+    $("total").innerText = "Total: $0.00";
+    show($("checkoutBtn"), false);
+    return;
+  }
+  let total = 0;
+  currentUser.cart.forEach(ci => {
+    total += ci.product.price * ci.quantity;
+    const li = document.createElement("li");
+    li.innerHTML = `<span>${escapeHtml(ci.product.title)} x ${ci.quantity}</span><span>$${(ci.product.price*ci.quantity).toFixed(2)}</span>`;
+    out.appendChild(li);
+  });
+  $("total").innerText = `Total: $${total.toFixed(2)}`;
+  show($("checkoutBtn"), true);
+}
+
+function checkout(){
+  if(!currentUser || !currentUser.cart || currentUser.cart.length===0) return alert("Cart empty");
+  let total=0; currentUser.cart.forEach(i=> total += i.product.price * i.quantity);
+  const earned = Math.floor(total/10);
+  currentUser.points = (currentUser.points||0) + earned;
+  currentUser.cart = [];
+  alert(`✅ Checkout done! You earned ${earned} eco points 🌱`);
+  updateUI();
+}
+
+function escapeHtml(text){
+  return String(text||"").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+// initial render
+updateUI();
+renderProducts();
