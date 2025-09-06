@@ -1,9 +1,70 @@
 // Simple client-side EcoFinds app
 let users = [];
 let products = [
-  {id:1,title:"Recycled Tote Bag",category:"Accessories",description:"Sturdy tote made from recycled fabric. Carry groceries guilt-free.",price:249, icon:"fa-solid fa-bag-shopping"},
-  {id:2,title:"Bamboo Toothbrush (2 pack)",category:"Personal Care",description:"Biodegradable toothbrushes with soft bristles.",price:129, icon:"fa-solid fa-tooth"},
-  {id:3,title:"Zero-waste Soap Bar",category:"Home",description:"Scented soap bar, plastic-free packaging.",price:89, icon:"fa-solid fa-soap"}
+  {
+    id: 1,
+    title: "Recycled Tote Bag",
+    category: "Accessories",
+    description: "Sturdy tote made from recycled fabric. Carry groceries guilt-free.",
+    price: 249,
+    icon: "fa-solid fa-bag-shopping"   // 🛍️ Shopping bag
+  },
+  {
+    id: 2,
+    title: "Bamboo Toothbrush (2 pack)",
+    category: "Personal Care",
+    description: "Biodegradable toothbrushes with soft bristles.",
+    price: 129,
+    icon: "fa-solid fa-tooth"          // 🦷 Tooth
+  },
+  {
+    id: 3,
+    title: "Zero-waste Soap Bar",
+    category: "Home",
+    description: "Scented soap bar, plastic-free packaging.",
+    price: 89,
+    icon: "fa-solid fa-soap"           // 🧼 Soap
+  },
+  {
+    id: 4,
+    title: "Herbal Shampoo",
+    category: "Personal Care",
+    description: "Eco herbal shampoo for soft, shiny hair.",
+    price: 179,
+    icon: "fa-solid fa-bottle-droplet" // 🧴 Shampoo bottle
+  },
+  {
+    id: 5,
+    title: "Seedling Kit",
+    category: "Garden",
+    description: "Grow small herbs at home. Starter seedling kit.",
+    price: 199,
+    icon: "fa-solid fa-seedling"       // 🌱 Seedling
+  },
+  {
+    id: 6,
+    title: "Reusable Water Bottle",
+    category: "Lifestyle",
+    description: "Stainless steel bottle keeps drinks hot or cold.",
+    price: 349,
+    icon: "fa-solid fa-bottle-water"   // 🚰 Water bottle
+  },
+  {
+    id: 7,
+    title: "Organic Cotton T-shirt",
+    category: "Clothing",
+    description: "Soft T-shirt made from 100% organic cotton.",
+    price: 499,
+    icon: "fa-solid fa-shirt"          // 👕 Shirt
+  },
+  {
+    id: 8,
+    title: "Solar Lamp",
+    category: "Electronics",
+    description: "Portable solar-powered LED lamp.",
+    price: 799,
+    icon: "fa-solid fa-sun"            // ☀️ Sun
+  }
 ];
 let nextProductId = 4;
 let currentUser = null;
@@ -213,3 +274,4 @@ function escapeHtml(text){
 // Initial render
 updateUI();
 renderProducts();
+
